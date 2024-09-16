@@ -1,0 +1,7 @@
+{
+    "require": {
+        "php": "^8.0",
+        "joetannenbaum/alfred-workflow": "^1.1",
+        "rodneyrehm/plist": "^2.0"
+    }
+}
