@@ -1,6 +1,6 @@
 # Tower Alfred Workflow
 
-Jump to specific [Tower](https://www.git-tower.com/mac) bookmarks directly from Alfred.
+Jump to specific [Tower](https://www.git-tower.com/mac) bookmarks directly from [Alfred](https://www.alfredapp.com).
 
 This PHP version of the workflow is adapted from [cjlucas/tower-alfred-workflow](https://github.com/cjlucas/tower-alfred-workflow), which stopped working for me at some point.
 
