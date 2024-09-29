@@ -3,27 +3,34 @@
 require_once('vendor/autoload.php');
 
 use Alfred\Workflows\Workflow;
-use CFPropertyList\CFPropertyList;
 
 $parsedBookmarks = [];
 $workflow = new Workflow();
 $bookmarkFile = $workflow->env('HOME') . "/Library/Application Support/com.fournova.Tower3/bookmarks-v2.plist";
 
-try {
-    $bookmarkData = new CFPropertyList($bookmarkFile, CFPropertyList::FORMAT_XML);
-} catch (Exception $e) {
-    $workflow->logger()->log('Couldn’t parse bookmark file: ' . $e->getMessage());
+if (! file_exists($bookmarkFile)) {
+    $workflow->logger()->log('Bookmark file is missing.');
     return;
 }
 
-$results = [];
+$xml = simplexml_load_string(file_get_contents($file));
+
+$collectedItems = [];
+$bookmarkNodes = $xml->dict[0]->array[0] ?? null;
+
+if ( ! $bookmarkNodes) {
+    $workflow->logger()->log('No bookmarks found.');
+    return;
+}
 
 $query = trim($workflow->argument() ?? '');
-$bookmarks = parseItems($bookmarkData->toArray()['children'], $parsedBookmarks);
+parseGroup($bookmarkNodes, $collectedItems);
 
-foreach ($bookmarks as $bookmark) {
-    if (str_contains($bookmark['name'], $query)) {
-        $results[] = $bookmark;
+$results = [];
+
+foreach ($collectedItems as $item) {
+    if (str_contains($item['name'], $query)) {
+        $results[] = $item;
     }
 }
 
@@ -39,45 +46,25 @@ foreach ($results as $hit) {
 
 $workflow->output();
 
-/**
- * Parse a Tower bookmark group (folder), recursively if necessary,
- * adding individual bookmarks to $this->parsedBookmarks.
- *
- * @param array $arr group
- * @param       $parsedBookmarks
- * @return void
- */
-function parseGroup(array $arr, &$parsedBookmarks): void
+function parseGroup($nodes, &$collectedItems): void
 {
-    foreach ($arr as $item) {
-        if (isGroup($item)) {
-            parseGroup($item['children'], $parsedBookmarks);
-        } else {
-            $parsedBookmarks[] = $item;
+    foreach ($nodes as $node) {
+        if (isBookmark($node)) {
+            $collectedItems[] = [
+                'fileURL' => (string)$node->string[0],
+                'name' => (string)$node->string[1],
+            ];
+        } else if (isFolder($node)) {
+            parseGroup($node->array->dict, $collectedItems);
         }
     }
 }
 
-/**
- * Parse nested bookmarks into flat array.
- *
- * @param array $arr multidimensional bookmark array read from Tower plist and converted by CFPropertyList
- * @return array      flat array of bookmark items
- */
-function parseItems(array $arr, $parsedBookmarks): array
+function isBookmark($node): bool
 {
-    parseGroup($arr, $parsedBookmarks);
-
-    return $parsedBookmarks;
+    return (int)$node->integer === 2;
 }
-
-/**
- * Determine whether the current item (array) is a Tower bookmark group.
- *
- * @param array $item element from multi-dimensional array of bookmarks
- * @return boolean      true if item is a folder (has `children` property)
- */
-function isGroup(array $item): bool
+function isFolder($node): bool
 {
-    return isset($item['children']);
+    return (int)$node->integer === 1;
 }
