@@ -1,7 +1,25 @@
 {
-    "require": {
-        "php": "^8.0",
-        "joetannenbaum/alfred-workflow": "^1.1",
-        "rodneyrehm/plist": "^2.0"
+  "name": "mattstein/alfred-tower-bookmarks-workflow",
+  "type": "project",
+  "description": "Launch Tower bookmarks from Alfred.",
+  "keywords": [
+    "alfred",
+    "tower"
+  ],
+  "license": "MIT",
+  "require": {
+    "php": "^8.0",
+    "joetannenbaum/alfred-workflow": "dev-master",
+    "rodneyrehm/plist": "dev-main"
+  },
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/mattstein/alfred-workflow"
+    },
+    {
+      "type": "vcs",
+      "url": "https://github.com/moodlehq/CFPropertyList"
     }
+  ]
 }
