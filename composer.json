@@ -8,7 +8,7 @@
   ],
   "license": "MIT",
   "require": {
-    "php": "^8.0",
+    "php": "^8.2",
     "joetannenbaum/alfred-workflow": "dev-master",
     "rodneyrehm/plist": "dev-main"
   },
@@ -21,5 +21,21 @@
       "type": "vcs",
       "url": "https://github.com/moodlehq/CFPropertyList"
     }
-  ]
+  ],
+  "scripts": {
+    "test": "pest"
+  },
+  "require-dev": {
+    "pestphp/pest": "^3.0"
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
+    }
+  },
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  }
 }
